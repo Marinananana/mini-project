@@ -2,7 +2,7 @@ import os
 import sys
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap
-from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QLabel, QLineEdit
+from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QLabel, QLineEdit, QCheckBox
 import requests
 
 
@@ -40,6 +40,8 @@ class Example(QWidget):
         self.address = QLabel("", self)
         self.address.setGeometry(10, 40, 470, 20)
         self.address.setStyleSheet("* { background-color: rgba(225,225,225,1) }")
+        self.tick = QCheckBox("", self)
+        self.tick.setGeometry(465, 41, 20, 20)
 
     def change_map_type(self):
         if self.is_map:
@@ -73,10 +75,13 @@ class Example(QWidget):
                 if toponym:
                     coords = [float(x) for x in toponym["Point"]["pos"].split()]
                     full_address = toponym["metaDataProperty"]["GeocoderMetaData"]["text"]
+                    postal_code = toponym["metaDataProperty"]["GeocoderMetaData"]["Address"]["postal_code"]
                     self.coords = coords.copy()
                     self.pt_coords = coords.copy()
                     self.is_map = True
                     self.address.setText(" " + full_address)
+                    if self.tick.isChecked():
+                        self.address.setText(self.address.text() + " " + postal_code)
                     self.map.setPixmap(self.get_map())
 
     def get_map(self):
@@ -94,6 +99,42 @@ class Example(QWidget):
             file.write(response.content)
         pixmap = QPixmap(self.map_file)
         os.remove(self.map_file)
+        return QPixmap(pixmap)
+
+    def del_pt(self):
+        self.pt_coords = [None, None]
+        self.address.setText("")
+        self.tick.setChecked(False)
+        if self.is_map:
+            self.map.setPixmap(self.get_map())
+
+    def keyPressEvent(self, event):
+        if self.is_map:
+            if event.key() == Qt.Key_PageUp:
+                if self.z < 17:
+                    self.z += 1
+            if event.key() == Qt.Key_PageDown:
+                if self.z > 0:
+                    self.z -= 1
+            # Стрелочки QT не хочет отрабатывать, поэтому WASD
+            # Кнопки WASD работают только на английской раскладке
+            if event.key() == Qt.Key_W:
+                self.coords[1] += 0.001
+            if event.key() == Qt.Key_S:
+                self.coords[1] -= 0.001
+            if event.key() == Qt.Key_A:
+                self.coords[0] -= 0.001
+            if event.key() == Qt.Key_D:
+                self.coords[0] += 0.001
+            self.map.setPixmap(self.get_map())
+
+
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    ex = Example()
+    ex.show()
+    sys.exit(app.exec())
+
         return QPixmap(pixmap)
 
     def del_pt(self):
