@@ -116,42 +116,7 @@ class Example(QWidget):
             if event.key() == Qt.Key_PageDown:
                 if self.z > 0:
                     self.z -= 1
-            # Стрелочки QT не хочет отрабатывать, поэтому WASD
-            # Кнопки WASD работают только на английской раскладке
-            if event.key() == Qt.Key_W:
-                self.coords[1] += 0.001
-            if event.key() == Qt.Key_S:
-                self.coords[1] -= 0.001
-            if event.key() == Qt.Key_A:
-                self.coords[0] -= 0.001
-            if event.key() == Qt.Key_D:
-                self.coords[0] += 0.001
-            self.map.setPixmap(self.get_map())
-
-
-if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    ex = Example()
-    ex.show()
-    sys.exit(app.exec())
-
-        return QPixmap(pixmap)
-
-    def del_pt(self):
-        self.pt_coords = [None, None]
-        self.address.setText("")
-        if self.is_map:
-            self.map.setPixmap(self.get_map())
-
-    def keyPressEvent(self, event):
-        if self.is_map:
-            if event.key() == Qt.Key_PageUp:
-                if self.z < 17:
-                    self.z += 1
-            if event.key() == Qt.Key_PageDown:
-                if self.z > 0:
-                    self.z -= 1
-            # Стрелочки QT не хочет отрабатывать, поэтому WASD
+            # Стрелочки QT не хочет отрабатывать, пожтому WASD
             # Кнопки WASD работают только на английской раскладке
             if event.key() == Qt.Key_W:
                 self.coords[1] += 0.001
